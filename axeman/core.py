@@ -214,16 +214,13 @@ def process_worker(result_info, output_dir="/tmp"):
                     result_info['log_info']['url'],
                     str(entry['cert_index']),
                     chain_hash,
-                    cert_data['leaf_cert']['as_der'],
-                    ' '.join(cert_data['leaf_cert']['all_domains']),
-                    str(cert_data['leaf_cert']['not_before']),
-                    str(cert_data['leaf_cert']['not_after'])
+                    ' '.join(cert_data['leaf_cert']['all_domains'])
                 ]) + "\n"
             )
 
         print("[{}] Finished, writing CSV...".format(os.getpid()))
 
-        with open(csv_file, 'w') as f:
+        with open(csv_file, 'w', encoding='utf-8') as f:
             f.write("".join(lines))
         print("[{}] CSV {} written!".format(os.getpid(), csv_file))
 
@@ -236,7 +233,7 @@ def process_worker(result_info, output_dir="/tmp"):
     return True
 
 async def get_certs_and_print():
-    with aiohttp.ClientSession(conn_timeout=5) as session:
+    async with aiohttp.ClientSession(conn_timeout=5) as session:
         ctls = await certlib.retrieve_all_ctls(session)
         print("Found {} CTLs...".format(len(ctls)))
         for log in ctls:
